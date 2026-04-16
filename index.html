@@ -715,6 +715,10 @@
         let logoUrl = cache.images && cache.images.logo ? cache.images.logo : '';
         let founderUrl = cache.images && cache.images.founder ? cache.images.founder : '';
         
+        const hConfig = cache.houseConfig || [];
+        const hColors = {};
+        hConfig.forEach(h => hColors[(h.name || '').toUpperCase()] = h.color);
+        
         // Build Premium A5 Certificate Templates
         let html = `<!DOCTYPE html>
         <html>
@@ -735,12 +739,6 @@
                     font-family: 'Montserrat', sans-serif;
                     color: #fff;
                 }
-                .cert-page::before {
-                    content: '';
-                    position: absolute; top:0; left:0; right:0; bottom:0;
-                    background: radial-gradient(circle at center, rgba(30,20,0,1) 0%, rgba(5,5,5,1) 100%);
-                    z-index: 1;
-                }
                 .sparkles {
                     position: absolute; top:0; left:0; right:0; bottom:0; z-index: 2;
                     background-image: 
@@ -754,7 +752,7 @@
                 }
                 .content { position: relative; z-index: 5; height: 100%; display: flex; flex-direction: column; align-items: center; padding: 25px 30px; }
                 
-                .header { width: 100%; position: relative; text-align: center; margin-bottom: 15px; padding: 0 65px; }
+                .header { width: 100%; position: relative; text-align: center; margin-bottom: 20px; padding: 0 65px; }
                 .logo-wrap { position: absolute; top: 0; left: 0; }
                 .logo-wrap img { width: 55px; height: 55px; object-fit: contain; }
                 
@@ -770,8 +768,6 @@
                 /* BIGGER PHOTO UPDATE */
                 .photo-circle {
                     width: 300px; height: 300px; border-radius: 50%;
-                    border: 8px solid #d4af37;
-                    box-shadow: 0 0 45px rgba(212,175,55,0.7), inset 0 0 25px rgba(0,0,0,0.8);
                     overflow: hidden; position: relative;
                     margin: 0 auto;
                     background: #111;
@@ -831,12 +827,28 @@
             let defaultPhoto = 'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23333\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/></svg>';
             let finalPhoto = st.photoUrl || defaultPhoto;
             
+            // DYNAMIC HOUSE COLOR LOGIC
+            let hName = (st.house || '').toUpperCase();
+            let baseHex = hColors[hName] || '#d4af37'; 
+            
+            let r = 212, g = 175, b = 55;
+            if(baseHex.length === 7) {
+                r = parseInt(baseHex.slice(1,3), 16) || r;
+                g = parseInt(baseHex.slice(3,5), 16) || g;
+                b = parseInt(baseHex.slice(5,7), 16) || b;
+            }
+            
+            let glow = `rgba(${r},${g},${b},0.65)`;
+            let darkBg = `rgba(${Math.max(10, Math.floor(r*0.25))},${Math.max(10, Math.floor(g*0.25))},${Math.max(10, Math.floor(b*0.25))},1)`;
+            let darkerBg = `rgba(${Math.max(2, Math.floor(r*0.05))},${Math.max(2, Math.floor(g*0.05))},${Math.max(2, Math.floor(b*0.05))},1)`;
+            
             let desc = `Congratulations on your brilliant achievement! 
             You have proven to be an outstanding student, demonstrating excellence and commitment. 
-            Your monumental contribution for <span>${st.house ? st.house.toUpperCase() + ' HOUSE' : 'YOUR HOUSE'}</span> & the <span>DEPARTMENT OF ${st.dept.toUpperCase()}</span> securing a massive <span>${st.pts} POINTS</span> validates you as a true asset to this institution.`;
+            Your monumental contribution for <span style="color:${baseHex}; text-shadow:0 0 8px ${glow};">${hName ? hName + ' HOUSE' : 'YOUR HOUSE'}</span> & the <span>DEPARTMENT OF ${st.dept.toUpperCase()}</span> securing a massive <span>${st.pts} POINTS</span> validates you as a true asset to this institution.`;
             
             html += `
             <div class="cert-page">
+                <div class="bg-gradient" style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:1;background:radial-gradient(circle at center, ${darkBg} 0%, ${darkerBg} 100%);"></div>
                 <div class="sparkles"></div>
                 <div class="content">
                     <div class="header">
@@ -854,7 +866,7 @@
                         <div class="award-subtitle">${title2}</div>
                     </div>
                     
-                    <div class="photo-circle">
+                    <div class="photo-circle" style="border: 8px solid ${baseHex}; box-shadow: 0 0 45px ${glow}, inset 0 0 25px rgba(0,0,0,0.8);">
                         <img src="${finalPhoto}" />
                     </div>
                     
