@@ -340,7 +340,7 @@
     /* ============================================================
        CONFIG
     ============================================================ */
-    const API = "https://script.google.com/macros/s/AKfycbyMFCrYNMGowP0KdfEUN1zPS67_YAKqRtCQ_WBQj2QJzhfQUKpejUvyvNIXcfHJvagWqA/exec";
+    const API = "https://script.google.com/macros/s/AKfycbzqVmbo36SDf1XQfjEicJRpvpScmKElC_kxjS7UJrq07vqonxS52IiEALl5D8Au3aqx1g/exec";
     
     /* ============================================================
        GLOBAL STATE
@@ -660,7 +660,7 @@
             toppers.forEach(t => {
                 if (t[1] >= cutoffScore) {
                     let rank = uniqueScores.indexOf(t[1]) + 1;
-                    certStudents.push({ name: t[0], pts: t[1], dept: dept, rank: rank, photoUrl: '' });
+                    certStudents.push({ name: t[0], pts: t[1], dept: dept, rank: rank, house: t[2] || '', photoUrl: '' });
                 }
             });
         }
@@ -681,7 +681,7 @@
                 </div>
                 <div style="flex:1;">
                     <div style="font-weight:900; font-size:16px; text-transform:uppercase; color:#fff;">${st.name} <span style="font-size:10px; color:#d4af37;">(Rank ${st.rank})</span></div>
-                    <div style="font-size:12px; color:#aaa; font-weight:600; margin-top:2px;">${st.dept.toUpperCase()} • ${st.pts} POINTS</div>
+                    <div style="font-size:12px; color:#aaa; font-weight:600; margin-top:2px;">${st.dept.toUpperCase()} • ${st.house ? st.house.toUpperCase() : ''} • ${st.pts} POINTS</div>
                     <div style="margin-top:8px;">
                         <label style="font-size:10px; font-weight:900; background:rgba(255,215,0,0.15); color:#d4af37; padding:6px 10px; border-radius:6px; cursor:pointer; letter-spacing:1px;">
                             📷 UPLOAD PHOTO
@@ -814,15 +814,6 @@
                 }
                 .description span { color: #d4af37; font-weight: 900; font-size: 12px; }
                 
-                .footer {
-                    position: absolute; bottom: 35px; left: 0; width: 100%;
-                    display: flex; justify-content: space-around; align-items: flex-end;
-                }
-                .sign-box { text-align: center; }
-                .sign-line { width: 120px; height: 1.5px; background: #d4af37; margin: 0 auto 6px; }
-                .sign-title { font-size: 10px; font-weight: 900; letter-spacing: 1.5px; color: #fff; text-transform: uppercase; }
-                .sign-sub { font-size: 8px; color: #888; letter-spacing: 1px; margin-top:2px; text-transform: uppercase; }
-                
                 @media print { body { background: #fff; } .cert-page { box-shadow: none; } .print-btn { display: none; } }
                 
                 .print-btn { position: fixed; top: 20px; right: 20px; z-index: 1000; background: linear-gradient(to right, #d4af37, #ffd700); color: #000; border: none; padding: 15px 30px; border-radius: 30px; font-weight: 900; font-family: 'Montserrat', sans-serif; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.5); font-size: 16px; }
@@ -840,7 +831,7 @@
             
             let desc = `Congratulations on your brilliant achievement! 
             You have proven to be an outstanding student, demonstrating excellence and commitment. 
-            Your monumental contribution to the <span>DEPARTMENT OF ${st.dept.toUpperCase()}</span> securing a massive <span>${st.pts} POINTS</span> validates you as a true asset to this institution.`;
+            Your monumental contribution for <span>${st.house ? st.house.toUpperCase() + ' HOUSE' : 'YOUR HOUSE'}</span> & the <span>DEPARTMENT OF ${st.dept.toUpperCase()}</span> securing a massive <span>${st.pts} POINTS</span> validates you as a true asset to this institution.`;
             
             html += `
             <div class="cert-page">
@@ -872,19 +863,6 @@
                     </div>
                     
                     <div class="description">${desc}</div>
-                    
-                    <div class="footer">
-                        <div class="sign-box">
-                            <div class="sign-line" style="margin-top:30px;"></div>
-                            <div class="sign-title">HEAD OF DEPARTMENT</div>
-                            <div class="sign-sub">${st.dept.toUpperCase()}</div>
-                        </div>
-                        <div class="sign-box">
-                            <div class="sign-line" style="margin-top:30px;"></div>
-                            <div class="sign-title">PRINCIPAL</div>
-                            <div class="sign-sub">Don Bosco Polytechnic</div>
-                        </div>
-                    </div>
                 </div>
             </div>`;
         });
