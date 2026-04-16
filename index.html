@@ -660,7 +660,16 @@
             toppers.forEach(t => {
                 if (t[1] >= cutoffScore) {
                     let rank = uniqueScores.indexOf(t[1]) + 1;
-                    certStudents.push({ name: t[0], pts: t[1], dept: dept, rank: rank, house: t[2] || '', photoUrl: '' });
+                    
+                    // FORCE ASSIGN A VALID HOUSE EVEN IF MISSING 
+                    let fallbackHouse = 'ALPHA'; // Fallback text
+                    const cache = JSON.parse(localStorage.getItem('goats_cache') || '{}');
+                    if (cache.houseConfig && cache.houseConfig.length > 0) {
+                        fallbackHouse = cache.houseConfig[0].name; // Uses real house 1
+                    }
+                    let studentHouse = t[2] ? t[2] : fallbackHouse;
+                    
+                    certStudents.push({ name: t[0], pts: t[1], dept: dept, rank: rank, house: studentHouse, photoUrl: '' });
                 }
             });
         }
@@ -827,8 +836,8 @@
             let defaultPhoto = 'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23333\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/></svg>';
             let finalPhoto = st.photoUrl || defaultPhoto;
             
-            // DYNAMIC HOUSE COLOR LOGIC
-            let hName = (st.house || '').toUpperCase();
+            // DYNAMIC HOUSE COLOR LOGIC (Always valid because of the fallback in openCertDashboard)
+            let hName = st.house.toUpperCase();
             let baseHex = hColors[hName] || '#d4af37'; 
             
             let r = 212, g = 175, b = 55;
@@ -844,7 +853,7 @@
             
             let desc = `Congratulations on your brilliant achievement! 
             You have proven to be an outstanding student, demonstrating excellence and commitment. 
-            Your monumental contribution for <span style="color:${baseHex}; text-shadow:0 0 8px ${glow};">${hName ? hName + ' HOUSE' : 'YOUR HOUSE'}</span> & the <span>DEPARTMENT OF ${st.dept.toUpperCase()}</span> securing a massive <span>${st.pts} POINTS</span> validates you as a true asset to this institution.`;
+            Your monumental contribution for <span style="color:${baseHex}; text-shadow:0 0 8px ${glow};">${hName} HOUSE</span> & the <span>DEPARTMENT OF ${st.dept.toUpperCase()}</span> securing a massive <span>${st.pts} POINTS</span> validates you as a true asset to this institution.`;
             
             html += `
             <div class="cert-page">
